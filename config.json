@@ -1,0 +1,9 @@
+{
+    "fonts": {
+        "ja": "NotoSansJP-Bold.otf",
+        "ko": "NotoSansKR-Regular.otf",
+        "other": "NotoSans-Regular.ttf"
+    },
+    "lang": "ja",
+    "api_key": ""
+}
