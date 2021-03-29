@@ -353,8 +353,17 @@ def generate_panel(panel: dict, colors: dict, session: Optional[requests.Session
     image2 = Image.new('RGBA', (image.width * 2, image.height * 2))
     canvas2 = ImageDraw.Draw(image2)
     size = get_size(panel)
-    display_asset = ImageUtil.ratio_resize(
+    background = ImageUtil.ratio_resize(
         ImageUtil.get_image(panel['displayAssets'][0]['background'], session).convert('RGBA'),
+        *size
+    )
+    image.paste(
+        background,
+        ImageUtil.center_x(background.width, image.width, 0),
+        background
+    )
+    display_asset = ImageUtil.ratio_resize(
+        ImageUtil.get_image(panel['displayAssets'][0]['url'], session).convert('RGBA'),
         *size
     )
     image.paste(
