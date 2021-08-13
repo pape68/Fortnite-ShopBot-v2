@@ -2,7 +2,7 @@
 Fortniteのショップ画像を生成するプログラム  
 
 サンプル
-![itemshop](https://user-images.githubusercontent.com/53356872/111251400-77c87c00-8652-11eb-8d1b-a6c595e90367.png)  
+![itemshop](https://user-images.githubusercontent.com/53356872/129329313-1be7ed82-4430-419a-a66e-6ba3f144698a.png)  
 
 # config
 ```
@@ -12,6 +12,7 @@ Fortniteのショップ画像を生成するプログラム
 |   `-- other: 他言語用のフォントファイル名  
 |-- lang: 画像生成に使う言語 (en/ar/de/es-419/es/fr/it/ja/ko/pl/pt-BR/ru/tr/zh-CN/zh-Hant)  
 |-- api_key: [FortniteApi.io](https://fortniteapi.io "FortniteApi.io")のAPIキー  
+|-- max_section_count: 縦方向の最大セクション数  
 ```
 
 # フォント

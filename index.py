@@ -17,6 +17,7 @@ MARGIN_TOP = 150
 MARGIN_BOTTOM = 20
 MARGIN_LEFT = 20
 MARGIN_RIGHT = 20
+SECTION_MARGIN = 200
 
 DOUBLEWIDE_SIZE = (660, 550)
 NORMAL_SIZE = (320, 550)
@@ -193,37 +194,57 @@ def get_section_width(section: dict) -> int:
     return size
 
 
-def get_shop_size(data: dict) -> Tuple[int, int]:
-    x_list = []
-    y = 0
-    for section in data['sections']:
-        x_list.append(get_section_width(section))
-        if len(section['panels']) == 1 and section['panels'][0]['tileSize'] == 'Small':
-            y += Y_MARGIN + SMALL_SIZE[1]
-        else:
-            y += Y_MARGIN + NORMAL_SIZE[1]
-    return MARGIN_LEFT + max(x_list) + MARGIN_RIGHT, MARGIN_TOP + y + MARGIN_BOTTOM
+def get_shop_size(data: dict, max_section_count: Optional[int] = 0) -> Tuple[int, int]:
+    if max_section_count > 0:
+        section_list = [data['sections'][i:i+max_section_count] for i in range(0, len(data['sections']), max_section_count)]
+    else:
+        section_list = [data['sections']]
+
+    x = -SECTION_MARGIN
+    y_list = []
+    for sections in section_list:
+        x_list = []
+        sections_y = 0
+        for section in sections:
+            x_list.append(get_section_width(section))
+            if len(section['panels']) == 1 and section['panels'][0]['tileSize'] == 'Small':
+                sections_y += Y_MARGIN + SMALL_SIZE[1]
+            else:
+                sections_y += Y_MARGIN + NORMAL_SIZE[1]
+        x += max(x_list) + SECTION_MARGIN
+        y_list.append(sections_y)
+    return MARGIN_LEFT + x + MARGIN_RIGHT, MARGIN_TOP + max(y_list) + MARGIN_BOTTOM
 
 
 def generate_image(data: dict, colors: dict, session: Optional[requests.Session] = requests.Session()) -> Image.Image:
     print(f"Generating shop image with {len(data['sections'])} sections")
     start = time.time()
     now = datetime.datetime.now(datetime.timezone.utc)
-    image = Image.new('RGB', get_shop_size(data), (0, 80, 190))
+    image = Image.new('RGB', get_shop_size(data, config['max_section_count']), (0, 80, 190))
 
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(generate_section, section, colors, now, session) for section in data['sections']]
-    
+
+    width = 0
+    x = 0
     y = MARGIN_TOP
-    for future in futures:
+    for count, future in enumerate(futures, 1):
         try:
             section_image = future.result()
         except Exception:
             print('Failed to generate section', file=sys.stderr)
             traceback.print_exc()
         else:
-            image.paste(section_image, (0, y), section_image)
-            y += section_image.height
+            section_width = section_image.width - MARGIN_LEFT - MARGIN_RIGHT
+            if section_width > width:
+                width = section_width
+            image.paste(section_image, (x, y), section_image)
+            if (count % config['max_section_count']) == 0:
+                x += width + SECTION_MARGIN
+                y = MARGIN_TOP
+                width = 0
+            else:
+                y += section_image.height
     end = time.time()
     print(f"Generated shop image in {end - start:.2f} seconds")
     return image
