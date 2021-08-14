@@ -195,10 +195,7 @@ def get_section_width(section: dict) -> int:
 
 
 def get_shop_size(data: dict, max_section_count: Optional[int] = 0) -> Tuple[int, int]:
-    if max_section_count > 0:
-        section_list = [data['sections'][i:i+max_section_count] for i in range(0, len(data['sections']), max_section_count)]
-    else:
-        section_list = [data['sections']]
+    section_list = [data['sections'][i:i+max_section_count] for i in range(0, len(data['sections']), max_section_count)]
 
     x = -SECTION_MARGIN
     y_list = []
@@ -220,7 +217,13 @@ def generate_image(data: dict, colors: dict, session: Optional[requests.Session]
     print(f"Generating shop image with {len(data['sections'])} sections")
     start = time.time()
     now = datetime.datetime.now(datetime.timezone.utc)
-    image = Image.new('RGB', get_shop_size(data, config['max_section_count']), (0, 80, 190))
+    if config['max_section_count'] >= 1:
+        max_section_count = config['max_section_count']
+    elif not config['max_section_count']:
+        max_section_count = len(data['sections'])
+    else:
+        max_section_count = -(-len(data['sections']) // int(1 / config['max_section_count']))
+    image = Image.new('RGB', get_shop_size(data, max_section_count), (0, 80, 190))
 
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(generate_section, section, colors, now, session) for section in data['sections']]
@@ -239,7 +242,7 @@ def generate_image(data: dict, colors: dict, session: Optional[requests.Session]
             if section_width > width:
                 width = section_width
             image.paste(section_image, (x, y), section_image)
-            if (count % config['max_section_count']) == 0:
+            if (count % max_section_count) == 0:
                 x += width + SECTION_MARGIN
                 y = MARGIN_TOP
                 width = 0

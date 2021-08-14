@@ -12,7 +12,7 @@ Fortniteのショップ画像を生成するプログラム
 |   `-- other: 他言語用のフォントファイル名  
 |-- lang: 画像生成に使う言語 (en/ar/de/es-419/es/fr/it/ja/ko/pl/pt-BR/ru/tr/zh-CN/zh-Hant)  
 |-- api_key: [FortniteApi.io](https://fortniteapi.io "FortniteApi.io")のAPIキー  
-|-- max_section_count: 縦方向の最大セクション数  
+|-- max_section_count: 縦方向の最大セクション数。小数の場合は割合とみなし、セクション数を割った数で分割される(例:0.5でセクション数が8だったら4:4になる)  
 ```
 
 # フォント
