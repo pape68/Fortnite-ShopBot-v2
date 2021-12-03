@@ -19,6 +19,7 @@ MARGIN_LEFT = 20
 MARGIN_RIGHT = 20
 SECTION_MARGIN = 200
 
+TRIPLEWIDE_SIZE = (1005, 550)
 DOUBLEWIDE_SIZE = (660, 550)
 NORMAL_SIZE = (320, 550)
 SMALL_SIZE = (260, 260)
@@ -173,7 +174,9 @@ def get_rarity_colors(session: Optional[requests.Session] = requests.Session()) 
 
 
 def get_size(panel: dict) -> Tuple[int, int]:
-    if panel['tileSize'] == 'DoubleWide':
+    if panel['tileSize'] == 'TripleWide':
+        return TRIPLEWIDE_SIZE
+    elif panel['tileSize'] == 'DoubleWide':
         return DOUBLEWIDE_SIZE
     elif panel['tileSize'] == 'Normal':
         return NORMAL_SIZE
